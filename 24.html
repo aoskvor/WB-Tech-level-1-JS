@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Таблица с данными</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            getData();
+
+            function getData() {
+                $.ajax({
+                    url: "http://www.filltext.com/?rows=1000&fname=%7BfirstName%7D&lname=%7BlastName%7D&tel=%7Bphone%7Cformat%7D&address=%7BstreetAddress%7D&city=%7Bcity%7D&state=%7BusState%7Cabbr%7D&zip=%7Bzip%7D&pretty=true",
+                    type: "GET",
+                    success: function(data) {
+                        renderTable(data);
+                    },
+                    error: function() {
+                        alert("Произошла ошибка при загрузке данных");
+                    }
+                });
+            }
+
+            function renderTable(data) {
+                var table = "<table>";
+                table += "<tr><th>First Name</th><th>Last Name</th><th>Telephone</th><th>Address</th><th>City</th><th>State</th><th>Zip</th></tr>";
+                $.each(data, function(index, item){
+                    table += "<tr><td>" + item.fname + "</td><td>" + item.lname + "</td><td>" + item.tel + "</td><td>" + item.address + "</td><td>" + item.city + "</td><td>" + item.state + "</td><td>" + item.zip + "</td></tr>";
+                });
+                table += "</table>";
+                $("#data-table").html(table);
+            }
+
+            $(document).on("change", "#sort-select", function() {
+                var sortBy = $(this).val();
+                sortTable(sortBy);
+            });
+
+            function sortTable(sortBy) {
+                var table, rows, switching, i, x, y, shouldSwitch;
+                table = document.getElementById("data-table");
+                switching = true;
+                while (switching) {
+                    switching = false;
+                    rows = table.rows;
+                    for (i = 1; i < (rows.length - 1); i++) {
+                        shouldSwitch = false;
+                        x = rows[i].getElementsByTagName("TD")[sortBy].innerText;
+                        y = rows[i + 1].getElementsByTagName("TD")[sortBy].innerText;
+                        if (x.toLowerCase() > y.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                    }
+                }
+            }
+        });
+    </script>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            cursor: pointer;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Таблица с данными</h1>
+    <select id="sort-select">
+        <option value="0">First Name</option>
+        <option value="1">Last Name</option>
+        <option value="2">Telephone</option>
+        <option value="3">Address</option>
+        <option value="4">City</option>
+        <option value="5">State</option>
+        <option value="6">Zip</option>
+    </select>
+    <div id="data-table"></div>
+</body>
+</html>
